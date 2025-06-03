@@ -90,8 +90,8 @@ The application emphasizes scalability, testability, and clean code practices, l
 
 1. Clone the repository:
    ```bash
-    git clone https://github.com/matnrocha/visor_ai_challenge.git
-    cd visor_ai_challenge
+    git clone https://github.com/matnrocha/AIChat.git
+    cd AIChat
    ```
 2. Configure the environment variables in both the backend and the frontend.
     ```bash
