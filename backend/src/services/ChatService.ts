@@ -5,6 +5,8 @@ import { Message } from '../entities/Message';
 import { LLMProvider } from '../llm/types';
 import { LLMFactory } from '../llm/LLMFactory';
 import { ILLM } from '../llm/ILLM';
+import { CustomError } from '../errors/CustomError';
+import { ErrorTypes } from '../errors/ErrorTypes';
 
 export class ChatService {
     private llm: ILLM;
@@ -41,12 +43,26 @@ export class ChatService {
 
     async updateSessionTitle(sessionId: string, userId: string, title: string): Promise<boolean> {
         const session = await this.sessionRepository.findById(sessionId);
-        if (!session || session.userId !== userId) {
-            throw new Error('Session not found or access denied');
+        
+        if (!session) {
+            throw new CustomError(
+                ErrorTypes.SESSION_NOT_FOUND,
+                'Session not found',
+                404
+            );
         }
+        
+        if (session.userId !== userId) {
+            throw new CustomError(
+                ErrorTypes.ACCESS_DENIED,
+                'You do not have permission to update this session',
+                403
+            );
+        }
+        
         return this.sessionRepository.updateTitle(sessionId, title);
     }
-
+    
     async deleteSession(sessionId: string, userId: string): Promise<boolean> {
         const session = await this.sessionRepository.findById(sessionId);
         if (!session || session.userId !== userId) {

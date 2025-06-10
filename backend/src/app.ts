@@ -6,6 +6,7 @@ import { chatRouter } from './routes/chatRoutes';
 import { connectToDatabase } from './config/database';
 import { modelRouter } from './routes/modelRoutes';
 import { setupSwagger } from './config/swagger';
+import { errorHandler } from './middlewares/errorHandler';
 
 class App {
   public express: express.Application;
@@ -15,6 +16,7 @@ class App {
     this.setupMiddlewares();
     setupSwagger(this.express);
     this.setupRoutes();
+    this.setupErrorHandler();
   }
 
   private setupMiddlewares(): void {
@@ -28,6 +30,10 @@ class App {
     this.express.use('/api/users', userRouter);
     this.express.use('/api/sessions', chatRouter);
     this.express.use('/api/models', modelRouter);
+  }
+
+  private setupErrorHandler(): void {
+    this.express.use(errorHandler);
   }
 
   public async initialize(): Promise<void> {

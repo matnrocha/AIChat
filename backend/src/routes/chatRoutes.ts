@@ -4,6 +4,9 @@ import { ChatService } from '../services/ChatService';
 import { ChatSessionRepository } from '../repositories/ChatSessionRepository';
 import { MessageRepository } from '../repositories/MessageRepository';
 import { authenticateToken } from '../middlewares/authMiddleware';
+import { validate } from '../middlewares/validationMiddleware';
+import { updateSessionTitleSchema } from '../validations/chatValidations';
+import { apiWrapper } from '../middlewares/apiWrapper';
 
 export const createChatRoutes = () => {
   const router = Router();
@@ -241,7 +244,11 @@ export const createChatRoutes = () => {
    *                   type: string
    *                   example: "Unexpected error"
    */
-  router.patch('/:id', chatController.updateSessionTitle);
+  router.patch(
+    '/:id',
+    validate(updateSessionTitleSchema),
+    apiWrapper(chatController.updateSessionTitle)
+  );
 
   /**
    * @swagger

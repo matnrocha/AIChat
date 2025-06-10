@@ -1,5 +1,7 @@
 import { Request, Response } from 'express';
 import { ChatService } from '../services/ChatService';
+import { CustomError } from '../errors/CustomError';
+import { ApiResponseHandler } from '../utils/apiResponse';
 
 export class ChatController {
   constructor(private chatService: ChatService) {}
@@ -77,16 +79,37 @@ export class ChatController {
         req.userId!,
         req.body.title
       );
+  
       if (success) {
-        res.json({ message: 'Session title updated successfully' });
+        ApiResponseHandler.sendSuccess(
+          res,
+          { message: 'Session title updated successfully' },
+          200
+        );
       } else {
-        res.status(404).json({ error: 'Session not found or update failed' });
+        throw new CustomError(
+          'UPDATE_FAILED',
+          'Failed to update session title',
+          500
+        );
       }
     } catch (error) {
-      if (error instanceof Error) {
-        res.status(400).json({ error: error.message });
+      if (error instanceof CustomError) {
+        ApiResponseHandler.sendCustomError(res, error);
+      } else if (error instanceof Error) {
+        ApiResponseHandler.sendError(
+          res,
+          'INTERNAL_ERROR',
+          error.message || 'An unexpected error occurred',
+          500
+        );
       } else {
-        res.status(400).json({ error: 'Unexpected error' });
+        ApiResponseHandler.sendError(
+          res,
+          'UNKNOWN_ERROR',
+          'An unknown error occurred',
+          500
+        );
       }
     }
   };
